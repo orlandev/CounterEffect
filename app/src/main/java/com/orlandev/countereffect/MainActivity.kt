@@ -29,8 +29,18 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
 
-                    CounterEffect()
+                    var currentValue by remember {
+                        mutableStateOf(0)
+                    }
 
+                    Column {
+
+                        Text(text = "Valor Actual: $currentValue")
+
+                        CounterEffect(maxValue = 10) { value ->
+                            currentValue = value
+                        }
+                    }
                 }
             }
         }
@@ -39,7 +49,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun CounterEffect(maxValue: Int = 20) {
+fun CounterEffect(maxValue: Int = 20, cantSelected: (Int) -> Unit) {
     var counter by remember {
         mutableStateOf(0)
     }
@@ -50,8 +60,9 @@ fun CounterEffect(maxValue: Int = 20) {
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Button(enabled = counter > 0, onClick = {
+            Button(modifier = Modifier.size(60.dp), enabled = counter > 0, onClick = {
                 counter--
+                cantSelected(counter)
             }) {
                 Text(text = "-")
             }
@@ -70,13 +81,16 @@ fun CounterEffect(maxValue: Int = 20) {
                 }) {
                 Text(
                     text = "$counter",
-
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.headlineMedium
                 )
             }
 
 
-            Button(enabled = counter < maxValue, onClick = { counter++ }) {
+            Button(modifier = Modifier.size(60.dp), enabled = counter < maxValue, onClick = {
+                counter++
+                cantSelected(counter)
+            }) {
                 Text(text = "+")
             }
 
